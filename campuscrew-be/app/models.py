@@ -33,3 +33,157 @@ class Users:
     @staticmethod
     def check_password(user, password):
         return check_password_hash(user["password"], password)
+class Services:
+    @staticmethod
+    def create_service(name, description, rate, category_id, user_id):
+        service_id = str(uuid.uuid4())
+        created_at = datetime.utcnow().isoformat()
+        response = supabase.table("services").insert({
+            "service_id": service_id,
+            "name": name,
+            "description": description,
+            "rate": rate,
+            "user_id": user_id,
+            "category_id": category_id,
+            "created_at": created_at
+        }).execute()
+
+        if not response.data:
+            return None, f"Failed to create service: {response.error.message if response.error else 'Unknown error'}"
+        return service_id, None
+
+    @staticmethod
+    def add_service_images(service_id, image_urls):
+        image_records = [{"service_id": service_id, "image_url": url} for url in image_urls]
+        response = supabase.table("serviceimages").insert(image_records).execute()
+
+        if not response.data:
+            return None, f"Failed to add service images: {response.error.message if response.error else 'Unknown error'}"
+        return response.data, None
+
+    @staticmethod
+    def update_service(service_id, updates):
+        return supabase.table('services').update(updates).eq('service_id', service_id).execute()
+    
+    @staticmethod
+    def update_availability(availability_id, updates):
+        return supabase.table('serviceavailability').update(updates).eq('availability_id', availability_id).execute()
+    
+    @staticmethod
+    def get_booking_from_slot_id(slot_id):
+        return supabase.table('bookings').select('booking_id').eq('availability_id', slot_id).execute()
+    
+    @staticmethod
+    def delete_booking_with_booking_id(booking_id):
+        return supabase.table('bookings').delete().eq('booking_id', booking_id).execute()
+    
+    @staticmethod
+    def delete_booking_with_slot_id(availability_id):
+        return supabase.table('bookings').delete().eq('availability_id', availability_id).execute()
+    
+    @staticmethod
+    def get_bookings_from_service_id(service_id):
+        return supabase.table('bookings').select('booking_id').eq('service_id', service_id).execute()
+    
+    @staticmethod
+    def delete_multiple_bookings(booking_ids):
+        return  supabase.table('bookings').delete().in_('booking_id', booking_ids).execute()
+    
+    @staticmethod
+    def delete_slots(slot_id):
+        return supabase.table('serviceavailability').delete().eq('availability_id', slot_id).execute()
+    
+    @staticmethod
+    def delete_slots_with_service_id(service_id):
+        return supabase.table('serviceavailability').delete().eq('service_id', service_id).execute()
+    
+    @staticmethod
+    def delete_service_images(service_id):
+        return supabase.table('serviceimages').delete().eq('service_id', service_id).execute()
+    
+    @staticmethod
+    def delete_service(service_id):
+        return supabase.table('services').delete().eq('service_id', service_id).execute()
+    
+    @staticmethod
+    def get_avail_id_of_booking(booking_id):
+        return supabase.table('bookings').select('availability_id').eq('booking_id', booking_id).single().execute()
+    
+    @staticmethod
+    def update_book_status_false(availability_id):
+        return supabase.table('serviceavailability').update({'is_booked': False}).eq('availability_id', availability_id).execute()
+    
+    @staticmethod
+    def add_availability_slots(service_id, availability):
+        slot_records = []
+
+        for slot in availability:
+            if 'max_hrs' not in slot or 'avail_slots' not in slot:
+                return None, "Each availability slot must have 'max_hrs' and 'avail_slots'"
+
+            if not isinstance(slot['avail_slots'], list):
+                return None, "'avail_slots' must be a list of timestamps in string format"
+
+            try:
+                for ts in slot['avail_slots']:
+                    datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")  
+                for ts in slot['avail_slots']:
+                    slot_records.append({
+                        "service_id": service_id,
+                        "max_hrs": slot["max_hrs"], 
+                        "avail_slots": ts,  
+                        "is_booked": False  
+                    })
+            except ValueError:
+                return None, "Invalid timestamp format in 'avail_slots'. Expected format: YYYY-MM-DD HH:MM:SS"
+
+        response = supabase.table("serviceavailability").insert(slot_records).execute()
+
+        if not response.data:
+            return None, f"Failed to add service availability: {response.error.message if response.error else 'Unknown error'}"
+        
+        return response.data, None
+    
+    @staticmethod
+    def get_all_services():
+        try:
+            response = supabase.table("services") \
+                .select("*,serviceimages(image_url),serviceavailability(max_hrs, avail_slots, is_booked, availability_id),users!inner(first_name, last_name, email)") \
+                .execute()
+
+            if not response.data:
+                return [], None
+
+            return response.data, None
+        except Exception as e:
+            return None, f"Error fetching services: {str(e)}"
+
+    @staticmethod
+    def get_services_by_category(category_id):
+        try:
+            response = supabase.table("services") \
+                .select("*, serviceimages(image_url), serviceavailability(max_hrs, avail_slots, is_booked, availability_id), users!inner(first_name, last_name, email)") \
+                .eq("category_id", category_id) \
+                .execute()
+
+            if not response.data:
+                return [], None
+
+            return response.data, None
+        except Exception as e:
+            return None, f"Error fetching services by category: {str(e)}"
+
+    @staticmethod
+    def get_services_by_user(user_id):
+        try:
+            response = supabase.table("services") \
+                .select("*, serviceimages(image_url), serviceavailability(max_hrs, avail_slots, is_booked, availability_id), users!inner(first_name, last_name, email)")\
+                .eq("user_id", user_id) \
+                .execute()
+
+            if not response.data:
+                return [], None
+
+            return response.data, None
+        except Exception as e:
+            return None, f"Error fetching services by user: {str(e)}"
