@@ -46,3 +46,44 @@ def login():
         return jsonify({'message': 'Login successful', 'user_id': user["user_id"],  'first_name': user["first_name"], 'lastName': user["last_name"], 'email': user["email"],  'is_pfw': user["is_pfw"]}), 200
     else:
         return jsonify({'error': 'Invalid email or password'}), 400
+
+
+@api.route("/fetchService", methods=["GET"])
+def get_services():
+    try:
+        category_id = request.args.get('category_id')
+        user_id = request.args.get('user_id')
+        if category_id:
+            services, error = Services.get_services_by_category(category_id)
+            if error:
+                return jsonify({"error": error}), 500
+            return jsonify({
+                "message": "Services fetched successfully",
+                "services": services,
+                "filter": "category",
+                "category_id": category_id
+            }), 200
+            
+        elif user_id:
+            services, error = Services.get_services_by_user(user_id)
+            if error:
+                return jsonify({"error": error}), 500
+            return jsonify({
+                "message": "Services fetched successfully",
+                "services": services,
+                "filter": "user",
+                "user_id": user_id
+            }), 200
+            
+        else:
+            services, error = Services.get_all_services()
+            if error:
+                return jsonify({"error": error}), 500
+            return jsonify({
+                "message": "Services fetched successfully",
+                "services": services,
+                "filter": "none"
+            }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
