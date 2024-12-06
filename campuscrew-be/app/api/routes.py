@@ -98,7 +98,7 @@ def create_service():
 
       
       
-      @api.route("/fetchService", methods=["GET"])
+@api.route("/fetchService", methods=["GET"])
 def get_services():
     try:
         category_id = request.args.get('category_id')
