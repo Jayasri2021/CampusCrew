@@ -194,3 +194,33 @@ def edit_slot(availability_id):
         return jsonify({"message": "Slot updated successfully", "updated_slot": response.data}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api.route("/createBooking", methods=["POST"])
+def create_booking():
+    try:
+        data = request.get_json()
+        service_id = data.get("service_id")
+        user_id = data.get("user_id")
+        availability_id = data.get("availability_id")
+
+        if not all([service_id, user_id, availability_id]):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        booking, error = Bookings.create_booking(service_id, user_id, availability_id)
+        
+        if error:
+            return jsonify({"error": error}), 400
+
+        return jsonify({
+            "message": "Booking created successfully",
+            "booking": {
+                "booking_id": booking["booking_id"],
+                "service_id": booking["service_id"],
+                "booked_by": booking["booked_by"],
+                "booking_time": booking["booking_time"],
+                "availability_id": booking["availability_id"]
+            }
+        }), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
