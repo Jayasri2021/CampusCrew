@@ -224,3 +224,33 @@ def create_booking():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api.route("/bookings/<user_id>", methods=["GET"])
+def get_user_bookings(user_id):
+    try:
+        bookings, error = Bookings.get_user_bookings(user_id)
+        if error:
+            return jsonify({"error": error}), 500
+
+        return jsonify({
+            "message": "Bookings fetched successfully",
+            "bookings": bookings
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api.route("/booking/<booking_id>", methods=["GET"])
+def get_booking_details(booking_id):
+    try:
+        booking, error = Bookings.get_booking_details(booking_id)
+        if error:
+            return jsonify({"error": error}), 500
+
+        return jsonify({
+            "message": "Booking fetched successfully",
+            "booking": booking
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
