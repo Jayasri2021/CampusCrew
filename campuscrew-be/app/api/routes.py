@@ -224,3 +224,71 @@ def create_booking():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api.route('/deleteSlotTiming/<slot_id>', methods=['DELETE'])
+def delete_slot_timing(slot_id):
+    try:
+        delete_booking_response = Services.delete_booking_with_slot_id(slot_id)        
+
+        slot_response = Services.delete_slots(slot_id)
+
+        if not slot_response.data:
+            return jsonify({"error": "Failed to delete slot timing"}), 500
+
+        return jsonify({"message": "Slot timing and associated bookings deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/deleteBooking/<booking_id>', methods=['DELETE'])
+def delete_booking(booking_id):
+    try:
+        # Get the availability_id associated with the booking to mark it as not booked
+        booking_response = Services.get_avail_id_of_booking(booking_id)
+        
+        if not booking_response.data:
+            return jsonify({"error": "Booking not found"}), 404
+        
+        availability_id = booking_response.data['availability_id']
+
+        # Delete the booking
+        delete_response = Services.delete_booking_with_booking_id(booking_id)
+
+        if not delete_response.data:
+            return jsonify({"error": "Failed to delete booking"}), 500
+
+        # Update availability slot to mark it as not booked
+        delete = Services.update_book_status_false(availability_id)
+
+        return jsonify({"message": "Booking deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/deleteService/<service_id>', methods=['DELETE'])
+def delete_service(service_id):
+    try:
+        # Step 1: Check for and delete related bookings
+        booking_response = Services.get_bookings_from_service_id(service_id)
+        
+        if booking_response.data:
+            booking_ids = [booking['booking_id'] for booking in booking_response.data]
+            delete_bookings_response = Services.delete_multiple_bookings(booking_ids)
+
+
+        # Step 2: Delete related availability slots
+        availability_response = Services.delete_slots_with_service_id(service_id)
+
+        # Step 3: Delete related images
+        image_response = Services.delete_service_images(service_id)
+
+        if not image_response.data:
+            return jsonify({"error": "Failed to delete service images"}), 500
+
+        # Step 4: Delete the service itself
+        service_response = Services.delete_service(service_id)
+
+        if not service_response.data:
+            return jsonify({"error": "Failed to delete service"}), 500
+
+        return jsonify({"message": "Service, bookings, availability slots, and images deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
