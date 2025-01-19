@@ -1,0 +1,44 @@
+.auth-container {
+  text-align: center;
+  width: 100%;
+}
+
+.sign-up-header {
+  margin-bottom: 20px;
+}
+
+.toggle-group-label {
+  margin-top: 20px;
+}
+
+.toggle-group {
+  margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+}
+.toggle-group .toggle-button {
+  flex: 1;
+  border-radius: 8px;
+  border: 1px solid #9c27b0;
+  color: #9649e3;
+}
+.toggle-group .toggle-button.Mui-selected {
+  background-color: #b272f2;
+  color: white;
+  border-color: #b272f2;
+}
+.toggle-group .toggle-button.Mui-selected:hover {
+  background-color: #c79be3;
+}
+
+.sign-up-button {
+  width: 100%;
+}
+
+.link {
+  margin-top: 20px;
+  text-decoration: none;
+}
+.link .link-text {
+  color: #3f51b5;
+}/*# sourceMappingURL=SignUp.css.map */
