@@ -137,3 +137,60 @@ def get_services():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api.route('/editService/<service_id>', methods=['PUT'])
+def edit_service(service_id):
+    try:
+        data = request.get_json()
+        updates = {}
+
+        if 'name' in data:
+            updates['name'] = data['name']
+        if 'description' in data:
+            updates['description'] = data['description']
+        if 'rate' in data:
+            updates['rate'] = data['rate']
+        if 'category_id' in data:
+            updates['category_id'] = data['category_id']
+
+        if not updates:
+            return jsonify({"error": "No valid fields to update"}), 400
+
+        response = Services.update_service(service_id, updates)
+
+        if not response.data:
+            return jsonify({"error": "Failed to update service"}), 500
+
+        return jsonify({"message": "Service updated successfully", "updated_service": response.data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/editSlot/<availability_id>', methods=['PUT'])
+def edit_slot(availability_id):
+    try:
+        data = request.get_json()
+        updates = {}
+        if 'avail_slots' in data:
+            if not all(isinstance(ts, str) for ts in data['avail_slots']):
+                return jsonify({"error": "'avail_slots' must be a list of timestamps in string format"}), 400
+            try:
+                ts = data['avail_slots']
+                datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                return jsonify({"error": "Invalid timestamp format in 'avail_slots'. Expected format: YYYY-MM-DD HH:MM:SS"}), 400
+            updates['avail_slots'] = data['avail_slots']
+        
+        if 'max_hrs' in data:
+            updates['max_hrs'] = data['max_hrs']
+
+        if not updates:
+            return jsonify({"error": "No valid fields to update"}), 400
+
+        response = Services.update_availability(availability_id, updates)
+
+        if not response.data:
+            return jsonify({"error": "Failed to update slot"}), 500
+
+        return jsonify({"message": "Slot updated successfully", "updated_slot": response.data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
