@@ -96,10 +96,9 @@ def create_service():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-@api.route("/fetchService", methods=["GET"])
+      
+      
+      @api.route("/fetchService", methods=["GET"])
 def get_services():
     try:
         category_id = request.args.get('category_id')
@@ -138,4 +137,3 @@ def get_services():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
