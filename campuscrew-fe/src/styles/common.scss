@@ -1,0 +1,22 @@
+// src/styles/common.scss
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f6f8;
+  }
+  
+  .auth-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+  }
+  
+  button {
+    font-size: 1rem;
+  }
+  
