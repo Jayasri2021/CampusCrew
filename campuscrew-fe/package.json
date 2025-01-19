@@ -1,0 +1,66 @@
+{
+  "name": "campus-crew-fe",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@date-io/date-fns": "^3.0.0",
+    "@date-io/dayjs": "^3.0.0",
+    "@date-io/luxon": "^3.0.0",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.5",
+    "@mui/material": "^6.1.5",
+    "@mui/x-date-pickers": "^7.23.1",
+    "@reduxjs/toolkit": "^2.3.0",
+    "@supabase/supabase-js": "^2.46.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.7",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.13",
+    "luxon": "^3.5.0",
+    "mui": "^0.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.2",
+    "react-responsive-carousel": "^3.2.23",
+    "react-router-dom": "^6.27.0",
+    "react-scripts": "5.0.1",
+    "react-scroll": "^1.9.0",
+    "react-toastify": "^10.0.6",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "npm-run-all --parallel start cypress:run",
+    "cypress:run": "wait-on http://localhost:3000 && cypress run",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "cypress": "^13.16.1",
+    "npm-run-all": "^4.1.5",
+    "parcel": "^2.12.0",
+    "sass": "^1.80.4",
+    "start-server-and-test": "^2.0.8"
+  }
+}
